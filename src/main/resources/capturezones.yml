@@ -1,0 +1,15 @@
+# Capture Zone Configuration
+capture-zones:
+  northeastmine:
+    capture-region: "northeastcapture"
+    mine-region: "northeastmine"
+    display-name: "Northeast Mine"
+    capture-time: 300  # Time in seconds (5 minutes)
+    capture-enabled: true
+
+  southwestmine:
+    capture-region: "southwestcapture"
+    mine-region: "southwestmine"
+    display-name: "Southwest Mine"
+    capture-time: 300
+    capture-enabled: true

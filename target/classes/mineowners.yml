@@ -1,0 +1,4 @@
+# Tracks which tribe owns each mine
+mines:
+  northeastmine: "None"  # No owner at start
+  southwestmine: "None"

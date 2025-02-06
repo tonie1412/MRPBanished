@@ -1,0 +1,40 @@
+name: MRPBanished
+main: me.tonie.mrpbanished.MRPBanished
+version: 1.0.0
+description: A dual-profile plugin for Glader and Banished profiles.
+author: YourName
+api-version: 1.19
+
+commands:
+  profile:
+    description: Manage player profiles.
+    usage: /<command> switch <Glader|Banished>
+    aliases: [profiles]
+    permission: mrpbanished.profile
+    permission-message: "&cYou do not have permission to use this command."
+
+  tribeassign:
+    description: Assign a player to a tribe.
+    usage: /tribeassign <TRIBE NAME>
+    permission: mrpbanished.admin
+    permission-message: "&cYou do not have permission to use this command."
+
+  tribeleave:
+    description: Allows a player to leave their current tribe.
+    usage: /tribeleave
+    permission: mrpbanished.profile
+    permission-message: "&cYou do not have permission to use this command."
+
+  mrpbanishedreload:
+    description: Reloads MRPBanished configuration files.
+    usage: /mrpbanishedreload
+    permission: mrpbanished.admin
+    permission-message: "&cYou do not have permission to use this command."
+
+permissions:
+  mrpbanished.profile:
+    description: Allows the use of profile commands.
+    default: true
+  mrpbanished.admin:
+    description: Allows administrative commands like resetting cooldowns and reloading configs.
+    default: op

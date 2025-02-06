@@ -1,0 +1,39 @@
+# Custom Mining Settings
+enable-mining: true  # Set to false to disable mining
+
+# Ore Settings
+ores:
+  coal:
+    display-name: "Coal Ore"
+    mining-time: 3   # Time in seconds
+    regen-time: 30   # Time in seconds before regenerating
+    drop-range: "1-2" # Random drop amount
+    allowed-pickaxes: ["Stone Pickaxe", "Iron Pickaxe", "Diamond Pickaxe"]
+
+  iron:
+    display-name: "Iron Ore"
+    mining-time: 6
+    regen-time: 60
+    drop-range: "1-2"
+    allowed-pickaxes: ["Iron Pickaxe", "Diamond Pickaxe"]
+
+  copper:
+    display-name: "Copper Ore"
+    mining-time: 9
+    regen-time: 90
+    drop-range: "1-2"
+    allowed-pickaxes: ["Iron Pickaxe", "Diamond Pickaxe"]
+
+  gold:
+    display-name: "Gold Ore"
+    mining-time: 12
+    regen-time: 120
+    drop-range: "1-2"
+    allowed-pickaxes: ["Iron Pickaxe", "Diamond Pickaxe"]
+
+  diamond:
+    display-name: "Diamond Ore"
+    mining-time: 15
+    regen-time: 180
+    drop-range: "1-2"
+    allowed-pickaxes: ["Diamond Pickaxe"]

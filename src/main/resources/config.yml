@@ -1,0 +1,80 @@
+# MRPBanished Main Configuration
+
+# Default roles assigned when switching to a specific profile
+default-roles:
+  Glader:
+    - greenie
+  Banished:
+    - banished
+
+# Roles that persist across profile switches (do not get removed)
+carry-over-roles:
+  - t-mod
+  - moderator
+  - admin
+  - senioradmin
+  - owner
+  - builder
+  - loreteam
+  - eventteam
+  - mediateam
+  - developer
+  - wckd
+
+# Roles that should be removed when switching to a specific profile
+restricted-roles:
+  Glader:
+    - banished
+  Banished:
+    - greenie
+
+# Cooldown time (in seconds) before a player can switch profiles again
+cooldown-time: 7200  # 2 hours
+
+# Spawn Locations
+spawns:
+  Glader:
+    world: "world"
+    x: 100
+    y: 65
+    z: -200
+
+  Banished:
+    default:
+      - world: "world"
+        x: -50
+        y: 70
+        z: 50
+      - world: "world"
+        x: -60
+        y: 70
+        z: 55
+      - world: "world"
+        x: -40
+        y: 70
+        z: 45
+
+    tribes:
+      northtribe:
+        world: "world"
+        x: -200
+        y: 70
+        z: 200
+
+      southtribe:
+        world: "world"
+        x: 300
+        y: 72
+        z: -100
+
+      westtribe:
+        world: "world"
+        x: -500
+        y: 68
+        z: 100
+
+      easttribe:
+        world: "world"
+        x: 600
+        y: 65
+        z: -300
