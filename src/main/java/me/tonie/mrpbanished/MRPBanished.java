@@ -1,8 +1,12 @@
 package me.tonie.mrpbanished;
 
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.session.SessionManager;
 import me.tonie.mrpbanished.api.BanishedAPI;
 import me.tonie.mrpbanished.commands.MRPBanishedReloadCommand;
 import me.tonie.mrpbanished.commands.profiles.ProfileCommand;
@@ -12,6 +16,7 @@ import me.tonie.mrpbanished.commands.tribes.TribeLeaveCommand;
 import me.tonie.mrpbanished.listeners.MineCaptureListener;
 import me.tonie.mrpbanished.listeners.PlayerJoinListener;
 import me.tonie.mrpbanished.listeners.MiningListener;
+import me.tonie.mrpbanished.listeners.MineableFlagHandler;
 import me.tonie.mrpbanished.managers.MineCaptureManager;
 import me.tonie.mrpbanished.managers.MiningManager;
 import me.tonie.mrpbanished.playerdata.PlayerDataManager;
@@ -31,66 +36,88 @@ public class MRPBanished extends JavaPlugin {
     private MineCaptureManager mineCaptureManager;
     private MiningManager miningManager;
     private WorldGuardPlugin worldGuard;
-    private static StateFlag MINEABLE_FLAG;
+
+    public static StateFlag MINEABLE_FLAG;
+
+    @Override
+    public void onLoad() {
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+            getLogger().info("[MRPBanished] Registering 'mineable' flag with WorldGuard...");
+            registerWorldGuardFlag();
+        } else {
+            getLogger().warning("[MRPBanished] WorldGuard is not installed! 'mineable' flag will not be registered.");
+        }
+    }
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
-        // Load LuckPerms
         try {
             luckPerms = LuckPermsProvider.get();
         } catch (Exception e) {
             getLogger().warning("LuckPerms not found! Some features may not work.");
         }
 
-        // Initialize managers and configurations
         playerDataManager = new PlayerDataManager();
         captureZoneConfig = new CaptureZoneConfig(this);
         miningConfig = new MiningConfig(this);
         mineCaptureManager = new MineCaptureManager(this);
         miningManager = new MiningManager(this);
 
-        // Load WorldGuard safely
         if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
             worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
-            getLogger().info("WorldGuard detected! Preparing custom flags...");
-            // Delay flag registration to ensure WorldGuard is fully loaded
-            Bukkit.getScheduler().runTaskLater(this, this::registerWorldGuardFlag, 40L); // 2-second delay
+            getLogger().info("WorldGuard detected! Registering flag handler...");
+            Bukkit.getScheduler().runTaskLater(this, this::registerWorldGuardHandlers, 40L);
         } else {
-            getLogger().warning("WorldGuard is not installed! 'mineable' flag will not be registered.");
+            getLogger().warning("WorldGuard is not installed! Some features may not work.");
         }
 
         miningManager.reloadBedrockOres();
 
-        // Register commands
         Bukkit.getPluginCommand("profile").setExecutor(new ProfileCommand(playerDataManager, this));
         Bukkit.getPluginCommand("profile").setTabCompleter(new ProfileCommandTabCompleter());
         Bukkit.getPluginCommand("tribeassign").setExecutor(new TribeAssignCommand(this));
         Bukkit.getPluginCommand("tribeleave").setExecutor(new TribeLeaveCommand(this));
         Bukkit.getPluginCommand("mrpbanishedreload").setExecutor(new MRPBanishedReloadCommand(this));
 
-        // Register event listeners
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new MineCaptureListener(this, mineCaptureManager, captureZoneConfig), this);
         Bukkit.getPluginManager().registerEvents(new MiningListener(this, miningConfig, worldGuard), this);
 
-        // Register API last to ensure all dependencies are initialized
         new BanishedAPI(this);
     }
 
     private void registerWorldGuardFlag() {
         try {
-            FlagRegistry registry = com.sk89q.worldguard.WorldGuard.getInstance().getFlagRegistry();
-            if (registry.get("mineable") == null) {
-                MINEABLE_FLAG = new StateFlag("mineable", false);
-                registry.register(MINEABLE_FLAG);
-                getLogger().info("[MRPBanished] Successfully registered 'mineable' flag.");
+            FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+
+            Flag<?> existing = registry.get("mineable");
+            if (existing instanceof StateFlag) {
+                MINEABLE_FLAG = (StateFlag) existing;
+                getLogger().info("[MRPBanished] Using existing 'mineable' flag.");
             } else {
-                getLogger().info("[MRPBanished] The 'mineable' flag is already registered.");
+                StateFlag flag = new StateFlag("mineable", false);
+                registry.register(flag);
+                MINEABLE_FLAG = flag;
+                getLogger().info("[MRPBanished] Successfully registered 'mineable' flag.");
             }
+        } catch (FlagConflictException e) {
+            getLogger().severe("[MRPBanished] Another plugin already registered the 'mineable' flag!");
+            e.printStackTrace();
         } catch (Exception e) {
             getLogger().severe("[MRPBanished] Failed to register 'mineable' flag!");
+            e.printStackTrace();
+        }
+    }
+
+    private void registerWorldGuardHandlers() {
+        try {
+            SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
+            sessionManager.registerHandler(MineableFlagHandler.FACTORY, null);
+            getLogger().info("[MRPBanished] Registered WorldGuard 'mineable' flag handler.");
+        } catch (Exception e) {
+            getLogger().severe("[MRPBanished] Failed to register WorldGuard handler for 'mineable' flag!");
             e.printStackTrace();
         }
     }

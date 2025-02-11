@@ -14,10 +14,12 @@ me\tonie\mrpbanished\managers\MiningManager$MiningTask$1.class
 me\tonie\mrpbanished\playerdata\PlayerDataManager.class
 me\tonie\mrpbanished\config\MiningConfig$OreData.class
 me\tonie\mrpbanished\listeners\MineCaptureListener.class
+me\tonie\mrpbanished\listeners\MineableFlagHandler$Factory.class
 me\tonie\mrpbanished\listeners\MiningListener.class
 me\tonie\mrpbanished\commands\tribes\TribeBetrayCommand.class
 me\tonie\mrpbanished\listeners\PlayerJoinListener.class
 me\tonie\mrpbanished\config\MiningConfig.class
+me\tonie\mrpbanished\listeners\MineableFlagHandler.class
 me\tonie\mrpbanished\config\CaptureZoneConfig.class
 me\tonie\mrpbanished\commands\profiles\ProfileCommand.class
 me\tonie\mrpbanished\api\events\PlayerProfileChangeEvent.class
