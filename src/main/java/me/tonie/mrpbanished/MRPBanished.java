@@ -34,15 +34,15 @@ public class MRPBanished extends JavaPlugin {
     private static StateFlag MINEABLE_FLAG;
 
     @Override
-    public void onLoad() {
-        registerWorldGuardFlag();
-    }
-
-    @Override
     public void onEnable() {
-        // Load dependencies
-        luckPerms = LuckPermsProvider.get();
         saveDefaultConfig();
+
+        // Load LuckPerms
+        try {
+            luckPerms = LuckPermsProvider.get();
+        } catch (Exception e) {
+            getLogger().warning("LuckPerms not found! Some features may not work.");
+        }
 
         // Initialize managers and configurations
         playerDataManager = new PlayerDataManager();
@@ -50,7 +50,16 @@ public class MRPBanished extends JavaPlugin {
         miningConfig = new MiningConfig(this);
         mineCaptureManager = new MineCaptureManager(this);
         miningManager = new MiningManager(this);
-        worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+
+        // Load WorldGuard safely
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+            worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+            getLogger().info("WorldGuard detected! Preparing custom flags...");
+            // Delay flag registration to ensure WorldGuard is fully loaded
+            Bukkit.getScheduler().runTaskLater(this, this::registerWorldGuardFlag, 40L); // 2-second delay
+        } else {
+            getLogger().warning("WorldGuard is not installed! 'mineable' flag will not be registered.");
+        }
 
         miningManager.reloadBedrockOres();
 
@@ -76,12 +85,12 @@ public class MRPBanished extends JavaPlugin {
             if (registry.get("mineable") == null) {
                 MINEABLE_FLAG = new StateFlag("mineable", false);
                 registry.register(MINEABLE_FLAG);
-                Bukkit.getLogger().info("[MRPBanished] Successfully registered 'mineable' flag.");
+                getLogger().info("[MRPBanished] Successfully registered 'mineable' flag.");
             } else {
-                Bukkit.getLogger().warning("[MRPBanished] The 'mineable' flag is already registered.");
+                getLogger().info("[MRPBanished] The 'mineable' flag is already registered.");
             }
         } catch (Exception e) {
-            Bukkit.getLogger().severe("[MRPBanished] Failed to register 'mineable' flag!");
+            getLogger().severe("[MRPBanished] Failed to register 'mineable' flag!");
             e.printStackTrace();
         }
     }
@@ -112,7 +121,7 @@ public class MRPBanished extends JavaPlugin {
 
     public void debug(String message) {
         if (getConfig().getBoolean("debug-mode")) {
-            Bukkit.getLogger().info("[MRPBanished DEBUG] " + message);
+            getLogger().info("[MRPBanished DEBUG] " + message);
         }
     }
 
